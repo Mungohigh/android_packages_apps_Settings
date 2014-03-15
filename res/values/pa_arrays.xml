@@ -17,6 +17,26 @@
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
+    <!-- Nav Drawer Menu Items -->
+    <string-array name="nav_drawer_items_phones">
+        <item>System</item>
+        <item>Status bar</item>
+        <item>Navigation bar</item>
+        <item>Notification Drawer and QS</item>
+        <item>Lockscreen</item>
+        <item>Animations</item>
+    </string-array>
+
+    <!-- For tablets -->
+    <string-array name="nav_drawer_items">
+        <item>System</item>
+        <item>Status bar</item>
+        <item>Navigation bar</item>
+        <item>Notification Drawer</item>
+        <item>Lockscreen</item>
+        <item>Animations</item>
+    </string-array>
+
     <!-- Notification LED -->
     <!-- Values for the notification light pulse spinners -->
     <string-array name="notification_pulse_length_entries" translatable="false">
