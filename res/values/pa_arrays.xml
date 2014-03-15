@@ -28,7 +28,7 @@
     </string-array>
 
     <!-- For tablets -->
-    <string-array name="nav_drawer_items">
+    <string-array name="nav_drawer_items_tablets">
         <item>System</item>
         <item>Status bar</item>
         <item>Navigation bar</item>
