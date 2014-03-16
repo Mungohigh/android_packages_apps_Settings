@@ -13,13 +13,17 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceScreen;
+import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
 
 import com.android.internal.util.paranoid.DeviceUtils;
 
@@ -29,6 +33,7 @@ import com.android.settings.AOSPAL.NotificationDrawerQsSettings;
 import com.android.settings.AOSPAL.StatusBarSettings;
 import com.android.settings.AOSPAL.SystemSettings;
 import com.android.settings.AOSPAL.LockscreenSettings;
+import com.android.settings.AOSPAL.NavDrawerListAdapter;
 import com.android.settings.R;
 import com.android.settings.SettingsPreferenceFragment;
 
@@ -60,8 +65,8 @@ public class RemixSettings extends SettingsPreferenceFragment {
     private ArrayList<NavDrawerItem> navDrawerItems;
     private NavDrawerListAdapter adapter;
 
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         mContainer = container;
 
         View view = inflater.inflate(R.layout.remix_settings, container, false);
@@ -89,6 +94,13 @@ public class RemixSettings extends SettingsPreferenceFragment {
             public void onPageScrollStateChanged(int arg0) {
             }
         });
+
+        return view;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+      super.onCreate(savedInstanceState);
 
         // Nav drawer
         mTitle = mDrawerTitle = getTitle();
@@ -122,6 +134,8 @@ public class RemixSettings extends SettingsPreferenceFragment {
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setHomeButtonEnabled(true);
 
+        mContext = this;
+
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
                 R.drawable.ic_drawer, //nav menu toggle icon
                 R.string.remix_settings_title, // nav drawer open - description for accessibility
@@ -148,7 +162,6 @@ public class RemixSettings extends SettingsPreferenceFragment {
 
         mDrawerList.setOnItemClickListener(new SlideMenuClickListener());
 
-        return view;
     }
 
     /**
@@ -162,6 +175,12 @@ public class RemixSettings extends SettingsPreferenceFragment {
             // display view for selected nav drawer item
             displayView(position);
         }
+    }
+
+    // navigation drawer dropdown menu
+    @Override
+    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+        return false;
     }
 
     @Override
@@ -308,10 +327,15 @@ public class RemixSettings extends SettingsPreferenceFragment {
         }
         // Handle action bar actions click
         switch (item.getItemId()) {
-        case R.id.action_settings:
-            return true;
-        default:
-            return super.onOptionsItemSelected(item);
+            case R.id.action_settings:
+                // settings
+                Intent intent = new Intent(this, SettingsActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 
