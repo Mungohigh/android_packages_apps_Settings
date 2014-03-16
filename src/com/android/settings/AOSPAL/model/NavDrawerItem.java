@@ -15,7 +15,7 @@
  */
 
 
-package com.android.settings.AOSPAL;
+package com.android.settings.AOSPAL.model;
 
 public class NavDrawerItem {
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.settings.AOSPAL;
+package com.android.settings.AOSPAL.adapter;
 
 import android.app.Activity;
 import android.content.Context;

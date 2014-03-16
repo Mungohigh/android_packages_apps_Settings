@@ -1,9 +1,10 @@
 package com.android.settings.AOSPAL;
 
+import android.app.ActionBar;
 import android.app.Activity;
-import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -15,11 +16,15 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceScreen;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v13.app.FragmentPagerAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -33,7 +38,8 @@ import com.android.settings.AOSPAL.NotificationDrawerQsSettings;
 import com.android.settings.AOSPAL.StatusBarSettings;
 import com.android.settings.AOSPAL.SystemSettings;
 import com.android.settings.AOSPAL.LockscreenSettings;
-import com.android.settings.AOSPAL.NavDrawerListAdapter;
+import com.android.settings.AOSPAL.adapter.NavDrawerListAdapter;
+import com.android.settings.AOSPAL.model.NavDrawerItem;
 import com.android.settings.R;
 import com.android.settings.SettingsPreferenceFragment;
 
@@ -41,7 +47,24 @@ import com.android.settings.SettingsPreferenceFragment;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RemixSettings extends SettingsPreferenceFragment {
+public class RemixSettings extends SettingsPreferenceFragment implements
+        ActionBar.OnNavigationListener {
+
+    // Fragments
+    private static final int System = 0;
+    private static final int StatusBar = 1;
+    private static final int NavBar = 2;
+    private static final int NotifDrawerQs = 3;
+    private static final int Lockscreen = 4;
+    private static final int Animations = 5;
+
+    private SystemSettings mSystemSettings;
+    private StatusBarSettings mStatusBarSettings;
+    private NavBarSettings mNavBarSettings;
+    private NotificationDrawerQsSettings mNotificationDrawerQsSettings;
+    private LockscreenSettings mLockscreenSettings;
+    private AnimationSettings mAnimationSettings;
+    private Context mContext;
 
     PagerTabStrip mPagerTabStrip;
     ViewPager mViewPager;
@@ -61,11 +84,8 @@ public class RemixSettings extends SettingsPreferenceFragment {
 
     // slide menu items
     private String[] navMenuTitles;
+    private int mPosition;
 
-    private ArrayList<NavDrawerItem> navDrawerItems;
-    private NavDrawerListAdapter adapter;
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mContainer = container;
 
@@ -102,6 +122,15 @@ public class RemixSettings extends SettingsPreferenceFragment {
     public void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
 
+        /*
+         * navSpinner (navigation dropdown menu that sit next to navigation drawer
+         */
+
+        ActionBar actionBar = getActionBar();
+
+        // Hide the action bar title by setting to false
+        if (actionBar != null) actionBar.setDisplayShowTitleEnabled(true);
+
         // Nav drawer
         mTitle = mDrawerTitle = getTitle();
 
@@ -115,7 +144,7 @@ public class RemixSettings extends SettingsPreferenceFragment {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.list_slidermenu);
 
-        navDrawerItems = new ArrayList<NavDrawerItem>();
+        ArrayList<NavDrawerItem> navDrawerItems = new ArrayList<NavDrawerItem>();
 
         // adding nav drawer items to array
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[0]));
@@ -126,13 +155,15 @@ public class RemixSettings extends SettingsPreferenceFragment {
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[5]));
 
         // setting the nav drawer list adapter
-        adapter = new NavDrawerListAdapter(getApplicationContext(),
+        NavDrawerListAdapter adapter = new NavDrawerListAdapter(getApplicationContext(),
                 navDrawerItems);
         mDrawerList.setAdapter(adapter);
 
         // enabling action bar app icon and behaving it as toggle button
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setHomeButtonEnabled(true);
+        if (getActionBar() != null) {
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+            getActionBar().setHomeButtonEnabled(true);
+        }
 
         mContext = this;
 
@@ -157,7 +188,7 @@ public class RemixSettings extends SettingsPreferenceFragment {
 
         if (savedInstanceState == null) {
             // on first time display view for first nav item
-            displayView(0);
+            displayView(System);
         }
 
         mDrawerList.setOnItemClickListener(new SlideMenuClickListener());
@@ -210,15 +241,18 @@ public class RemixSettings extends SettingsPreferenceFragment {
     }
 
     class TabsPagerAdapter extends FragmentPagerAdapter {
-        String titles[] = getTitles();
+
+        final int PAGE_COUNT = 6;
+        // Tab Titles
+        private String tabtitles[] = new String[]{"System", "Status Bar", "Navigation Bar", "Notification Drawer and QS", "Lockscreen", "Animations"};
 
         public TabsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
         @Override
-        public Fragment getItem(int index) {
-            switch (index) {
+        public Fragment getItem(int position) {
+        switch (position) {
             case 0:
                 return new SystemSettings();
             case 1:
@@ -238,36 +272,13 @@ public class RemixSettings extends SettingsPreferenceFragment {
 
         @Override
         public int getCount() {
-            // get item count - equal to number of tabs
-            return 6;
+            return PAGE_COUNT;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return titles[position];
+            return tabtitles[position];
         }
-    }
-
-    private String[] getTitles() {
-        String titleString[];
-        if (!DeviceUtils.isPhone(getActivity())) {
-        titleString = new String[]{
-                    getString(R.string.remix_settings_system_title),
-                    getString(R.string.remix_settings_statusbar_title),
-                    getString(R.string.navigation_bar),
-                    getString(R.string.remix_settings_notification_drawer),
-                    getString(R.string.remix_settings_lockscreen_title),
-                    getString(R.string.remix_settings_animations_title)};
-        } else {
-        titleString = new String[]{
-                    getString(R.string.remix_settings_system_title),
-                    getString(R.string.remix_settings_statusbar_title),
-                    getString(R.string.navigation_bar),
-                    getString(R.string.remix_settings_notification_drawer_qs),
-                    getString(R.string.remix_settings_lockscreen_title),
-                    getString(R.string.remix_settings_animations_title)};
-        }
-        return titleString;
     }
 
      /**
@@ -277,31 +288,31 @@ public class RemixSettings extends SettingsPreferenceFragment {
         // update the main content by replacing fragments
         Fragment fragment = null;
         switch (position) {
-        case 0:
-            fragment = new SystemSettings();
-            break;
-        case 1:
-            fragment = new StatusBarSettings();
-            break;
-        case 2:
-            fragment = new NavBarSettings();
-            break;
-        case 3:
-            fragment = new NotificationDrawerQsSettings();
-            break;
-        case 4:
-            fragment = new LockscreenSettings();
-            break;
-        case 5:
-            fragment = new AnimationSettings();
-            break;
+            case System:
+                fragment = mSystemSettings();
+                break;
+            case StatusBar:
+                fragment = mStatusBarSettings();
+                break;
+            case NavBar:
+                fragment = mNavBarSettings();
+                break;
+            case NotifDrawerQs:
+                fragment = mNotificationDrawerQsSettings();
+                break;
+            case Lockscreen:
+                fragment = mLockscreenSettings();
+                break;
+            case Animations:
+                fragment = mAnimationSettings();
+                break;
 
-        default:
-            break;
+            default:
+                break;
         }
 
         if (fragment != null) {
-            FragmentManager fragmentManager = getFragmentManager();
+            FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
                     .replace(R.id.frame_container, fragment).commit();
 
@@ -315,28 +326,23 @@ public class RemixSettings extends SettingsPreferenceFragment {
             invalidateOptionsMenu();
         } else {
             // error in creating fragment
-            Log.e("MainActivity", "Error in creating fragment");
+            Log.e("RemixSettings", "Error in creating fragment");
         }
     }
 
-   @Override
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // toggle nav drawer on selecting action bar app icon/title
-        if (mDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-        // Handle action bar actions click
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                // settings
-                Intent intent = new Intent(this, SettingsActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+	    // toggle nav drawer on selecting action bar app icon/title
+	    if (mDrawerToggle.onOptionsItemSelected(item)) {
+	    	return true;
+	    }
+	    // Handle action bar actions click
+	    switch (item.getItemId()) {
+	    case R.id.action_settings:
+	     	return true;
+	    default:
+	    	return super.onOptionsItemSelected(item);
+	    }
     }
 
     /***
