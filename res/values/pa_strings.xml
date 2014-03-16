@@ -28,17 +28,16 @@
     <string name="remix_settings_notification_drawer_qs">Notification Drawer and QS</string>
     <string name="remix_settings_notification_drawer">Notification Drawer</string>
 
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    <string name="refresh">Refresh</string>
+
     <!-- General strings -->
     <string name="default_string">Default</string>
     <string name="enabled">Enabled</string>
     <string name="kernel_tweaker">Kernel Tweaker</string>
     <string name="personalize">Personalize</string>
     <string name="controls">Controls</string>
-
-    <string name="desc_list_item_icon">Item Icon</string>
-    <string name="about">About</string>
-    <string name="action_settings">Settings</string>
-    <string name="refresh">Refresh</string>
 
     <!-- Remix Settings - Summaries -->
     <string name="navigation_ring_summary">Set custom navigation bar targets besides than Google Now</string>

@@ -1,5 +1,5 @@
 <!--
-  Copyright © 2014 Ayysir
+  Copyright 2013 The Android Open Source Project
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -20,16 +20,4 @@
         android:icon="@drawable/ic_action_refresh"
         android:showAsAction="ifRoom"
         android:title="@string/refresh" />
-    <item
-        android:id="@+id/action_settings"
-        android:icon="@drawable/ic_action_overflow"
-        android:orderInCategory="3"
-        android:showAsAction="never"
-        android:title="@string/action_settings" />
-
-    <item
-        android:id="@+id/action_about"
-        android:orderInCategory="2"
-        android:showAsAction="never"
-        android:title="@string/about" />
 </menu>
